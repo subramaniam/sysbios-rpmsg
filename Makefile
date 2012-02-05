@@ -31,7 +31,7 @@
 #
 
 # Repo
-REPO		= /usr/local
+REPO		= /media/data/opt/ti/
 
 # Edit Dependency Versions:
 XDCROOTVER	= xdctools_3_22_01_21

@@ -159,8 +159,7 @@ struct resource resources[] = {
      * Virtio entries must come first.
      */
     { TYPE_VIRTIO_DEV,0,IPU_C0_FEATURES,0,0,0,0,VIRTIO_ID_RPMSG,0,0,0,0,"vdev:rpmsg"},
-    { TYPE_VRING, 0, VRING0_DA, 0, 0, 0,VQ0_SIZE,0,0,0,0,0,"vring:sysm3->mpu"},
-    { TYPE_VRING, 1, VRING1_DA, 0, 0, 0,VQ1_SIZE,0,0,0,0,0,"vring:mpu->sysm3"},
+    { TYPE_VRING, 0, VRING0_DA, 0, 0 , 0,VQ0_SIZE,0,0,0,0,0,"vring:sysm3,mpu,appm3"},
     /*
      * Contig Memory allocation entries must come after the virtio entries,
      * but before the reset of the gang.
