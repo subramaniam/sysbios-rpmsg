@@ -58,6 +58,7 @@
 #include <ti/srvmgr/ServiceMgr.h>
 #include <ti/srvmgr/rpmsg_omx.h>
 #include <ti/srvmgr/omx_packet.h>
+#include <ti/gates/hwspinlock/HwSpinlock.h>
 
 /* Turn on/off printf's */
 #define CHATTER 0
@@ -261,7 +262,7 @@ Int main(Int argc, char* argv[])
     start_resmgr_task();
 #endif
 
-#if 0  /* DSP or CORE0 or IPU */
+#if 1  /* DSP or CORE0 or IPU */
     /* Run a background task to test hwspinlock */
     start_hwSpinlock_task();
 #endif

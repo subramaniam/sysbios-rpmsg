@@ -68,11 +68,27 @@
 #define VIRTIO_RING_F_SYMMETRIC 30 /* We support symmetric vring */
 
 /* Resource info: Must match include/linux/remoteproc.h: */
-#define TYPE_CARVEOUT    0
-#define TYPE_DEVMEM      1
-#define TYPE_TRACE       2
-#define TYPE_VDEV        3
-#define TYPE_CRASHDUMP   4
+#define TYPE_CARVEOUT        0
+#define TYPE_DEVMEM          1
+#define TYPE_TRACE           2
+#define TYPE_VDEV            3
+#define TYPE_CRASHDUMP       4
+#define TYPE_CUSTOMRSC       5
+
+
+/* Custom Resource info: Must match include/linux/omap_remoteproc.h */
+#define TYPE_HWSPIN    1
+
+struct fw_rsc_sub_spinlock {
+    UInt32 da;
+    Char name[32];
+    UInt32 reserved;
+};
+
+union fw_custom_rsc {
+    struct fw_rsc_sub_spinlock hwspin;
+    /* add custom resources here */
+};
 
 /* Common Resource Structure Types */
 struct fw_rsc_carveout {
@@ -122,5 +138,14 @@ struct fw_rsc_vdev {
     Char    num_of_vrings;
     Char    reserved[2];
 };
+
+/* FIXME: rename accordingly */
+struct fw_rsc_custom {
+    UInt32  type;
+    UInt32  sub_type;
+    UInt32  size;
+    union   fw_custom_rsc rsc_sub;
+};
+
 
 #endif /* _RSC_TYPES_H_ */

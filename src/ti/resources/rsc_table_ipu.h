@@ -43,6 +43,8 @@
 #define _RSC_TABLE_IPU_H_
 
 #include <ti/resources/rsc_types.h>
+#include <ti/gates/hwspinlock/HwSpinlock.h>
+
 
 /* IPU Memory Map */
 #define L4_44XX_BASE            0x4a000000
@@ -132,7 +134,7 @@ struct resource_table {
     UInt32 version;
     UInt32 num;
     UInt32 reserved[2];
-    UInt32 offset[15];  /* Should match 'num' in actual definition */
+    UInt32 offset[16];  /* Should match 'num' in actual definition */
 
     /* rpmsg vdev entry */
     struct fw_rsc_vdev rpmsg_vdev;
@@ -180,16 +182,22 @@ struct resource_table {
 
     /* devmem entry */
     struct fw_rsc_devmem devmem9;
+
+    /* hwspinlock state */
+    struct fw_rsc_custom hwspinlockstate;
+    //struct fw_rsc_trace hwspinlockstate;
 };
 
+
 #define TRACEBUFADDR (UInt32)&ti_trace_SysMin_Module_State_0_outbuf__A
+#define HWSPINKLOCKSTATEADDR (UInt32)&ti_gates_HwSpinlock_sharedstate
 
 #pragma DATA_SECTION(ti_resources_ResourceTable, ".resource_table")
 #pragma DATA_ALIGN(ti_resources_ResourceTable, 4096)
 
 struct resource_table ti_resources_ResourceTable = {
     1,      /* we're the first version that implements this */
-    15,     /* number of entries in the table */
+    16,     /* number of entries in the table */
     0, 0,   /* reserved, must be zero */
     /* offsets to entries */
     {
@@ -208,6 +216,7 @@ struct resource_table ti_resources_ResourceTable = {
         offsetof(struct resource_table, devmem7),
         offsetof(struct resource_table, devmem8),
         offsetof(struct resource_table, devmem9),
+        offsetof(struct resource_table, hwspinlockstate),
     },
 
     /* rpmsg vdev entry */
@@ -301,6 +310,16 @@ struct resource_table ti_resources_ResourceTable = {
         IPU_PERIPHERAL_DMM, L3_PERIPHERAL_DMM,
         SZ_1M, 0, 0, "IPU_PERIPHERAL_DMM",
     },
+
+    {
+        TYPE_CUSTOMRSC,	TYPE_HWSPIN,
+        sizeof(struct fw_rsc_sub_spinlock),
+        { HWSPINKLOCKSTATEADDR, "hwspin", 0},
+    },
+
+    /*{
+        TYPE_TRACE, HWSPINKLOCKSTATEADDR, 0x8000, 0, "trace:sysm3",
+    },*/
 };
 
 #endif /* _RSC_TABLE_IPU_H_ */

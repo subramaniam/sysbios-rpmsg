@@ -163,12 +163,14 @@ Void hwSpinlockTestTaskFxn(UArg arg0, UArg arg1)
 
     System_printf("End of tsk(0x%x) pri(%d) ...\n",
                    Task_self(), Task_getPri(Task_self()));
+    ti_gates_HwSpinlock_sharedstate = 0xffff00ff;
+    System_printf("value of sharedstate is %x\n", ti_gates_HwSpinlock_sharedstate);
     return;
 }
 
 Void start_hwSpinlock_task()
 {
-#ifdef CORE0
+#if 1
     Task_Params params;
 
     Task_Params_init(&params);

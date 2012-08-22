@@ -201,6 +201,8 @@ Int HwSpinlock_getId(HwSpinlock_Handle handle);
  */
 HwSpinlock_State HwSpinlock_getState(HwSpinlock_Handle handle);
 
+extern int ti_gates_HwSpinlock_sharedstate;
+
 #if defined (__cplusplus)
 }
 #endif /* defined (__cplusplus) */

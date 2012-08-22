@@ -40,6 +40,7 @@
 #include <xdc/runtime/IGateProvider.h>
 #include <xdc/runtime/Log.h>
 #include <xdc/runtime/Diags.h>
+#include <xdc/runtime/System.h>
 #include <xdc/runtime/Gate.h>
 
 #include <ti/sysbios/knl/Task.h>
@@ -51,6 +52,23 @@
 
 static HwSpinlock_Module_State HwSpinlock_module = { 0 };
 
+
+Int ti_gates_HwSpinlock_sharedstate;
+
+
+/* Helper functions to set and reset status of a lock */
+
+inline Void HwSpinlock_set(Int hwlockId)
+{
+    ti_gates_HwSpinlock_sharedstate |= 1 << hwlockId;
+    asm(" dsb");
+}
+
+inline Void HwSpinlock_clr(Int hwlockId)
+{
+    ti_gates_HwSpinlock_sharedstate &= ~(1 << hwlockId);
+    asm(" dsb");
+}
 /*
  *************************************************************************
  *                       Instance functions
@@ -192,6 +210,7 @@ Int HwSpinlock_enter(HwSpinlock_Handle handle, HwSpinlock_PreemptGate pType,
 
     Assert_isTrue(handle, NULL);
 
+    System_printf("Entering the spinlock\n");
     /* Store Start TimeStamp */
     if (timeout != HwSpinlock_WAIT_FOREVER) {
         start = Clock_getTicks();
@@ -208,6 +227,7 @@ Int HwSpinlock_enter(HwSpinlock_Handle handle, HwSpinlock_PreemptGate pType,
             hkey->key = IGateProvider_enter(handle->preemptGates[pType]);
             hkey->valid = TRUE;
             handle->pType = pType;
+	    HwSpinlock_set(handle->params.id);
             return (HwSpinlock_S_SUCCESS);
         }
 
@@ -233,11 +253,13 @@ Void HwSpinlock_leave(HwSpinlock_Handle handle, HwSpinlock_Key *hkey)
 {
     Assert_isTrue(handle, NULL);
 
+    System_printf("Leaving the spinlock\n");
     /* Only unlock hwspinlock if it was really acquired and isa valid key */
     if (handle->state == HwSpinlock_STATE_TAKEN && hkey->valid) {
        /* Leave the spinlock */
         handle->baseAddr[handle->params.id] = 0;
         handle->state = HwSpinlock_STATE_FREE;
+	HwSpinlock_clr(handle->params.id);
 
         /* Restore Preemption of pType */
         IGateProvider_leave(handle->preemptGates[handle->pType], hkey->key);
